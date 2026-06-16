@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover, user-scalable=no" />
+<title>عداد الاستغفار</title>
+<meta name="theme-color" content="#0B1F22">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep:#0B1F22;
+    --bg-panel:#102B2E;
+    --gold:#C9A227;
+    --gold-soft:#E8C766;
+    --ivory:#F3ECDD;
+    --sage:#7BAB97;
+    --ring-empty: rgba(243,236,221,0.16);
+    --shadow: rgba(0,0,0,0.45);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh;
+    background:radial-gradient(circle at 50% -8%, #173A3D 0%, var(--bg-deep) 55%, #081416 100%);
+    font-family:'Tajawal',sans-serif;
+    color:var(--ivory);
+    display:flex;
+    justify-content:center;
+  }
+  .app{
+    max-width:460px;
+    width:100%;
+    padding:max(28px, env(safe-area-inset-top)) 20px calc(30px + env(safe-area-inset-bottom));
+    display:flex;
+    flex-direction:column;
+    gap:24px;
+    min-height:100vh;
+    opacity:1;
+    transition:opacity .35s ease;
+  }
+  header{text-align:center;}
+  .eyebrow{font-size:12px;letter-spacing:1.5px;color:var(--gold-soft);margin:0 0 6px;opacity:.9;}
+  h1{font-family:'Amiri',serif;font-size:27px;margin:0 0 8px;font-weight:700;}
+  .tagline{font-size:13px;color:var(--sage);margin:0;line-height:1.6;}
+
+  .beads-wrap{position:relative;width:266px;height:266px;margin:6px auto 0;}
+  svg.ring{width:100%;height:100%;display:block;}
+  .bead{transition:fill .25s ease, opacity .25s ease;}
+  .bead.empty{fill:var(--ring-empty);}
+  .bead.filled{fill:var(--gold);filter:drop-shadow(0 0 4px rgba(201,162,39,.65));}
+
+  .center-btn{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    width:164px;height:164px;border-radius:50%;
+    border:1px solid rgba(243,236,221,.22);
+    background:radial-gradient(circle at 35% 28%, #18403F, #0E2628 72%);
+    color:var(--ivory);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    box-shadow:0 10px 26px var(--shadow), inset 0 0 28px rgba(0,0,0,.35);
+    user-select:none;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .center-btn:active{transform:translate(-50%,-50%) scale(.94);box-shadow:0 4px 14px var(--shadow), inset 0 0 28px rgba(0,0,0,.45);}
+  .center-btn:focus-visible{outline:2px solid var(--gold-soft);outline-offset:4px;}
+  .btn-phrase{font-family:'Amiri',serif;font-size:21px;line-height:1.5;text-align:center;}
+
+  .ring-pulse{animation:pulseRound .9s ease;}
+  @keyframes pulseRound{
+    0%{filter:drop-shadow(0 0 0px rgba(201,162,39,0));}
+    40%{filter:drop-shadow(0 0 16px rgba(232,199,102,.85));}
+    100%{filter:drop-shadow(0 0 0px rgba(201,162,39,0));}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .ring-pulse{animation:none;}
+    .bead,.center-btn,.app{transition:none;}
+  }
+
+  .stats-row{display:flex;align-items:center;justify-content:center;gap:14px;background:var(--bg-panel);border-radius:18px;padding:16px 8px;}
+  .stat{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;min-width:0;}
+  .stat-value{font-weight:700;font-size:21px;color:var(--gold-soft);}
+  .stat-label{font-size:11.5px;color:var(--sage);text-align:center;}
+  .divider{width:1px;height:30px;background:rgba(243,236,221,.12);flex:none;}
+
+  .text-btn{background:none;border:none;color:var(--sage);font-family:'Tajawal';font-size:13px;text-decoration:underline;align-self:center;cursor:pointer;padding:4px 8px;}
+  .text-btn:disabled{opacity:.35;text-decoration:none;cursor:default;}
+
+  .history h2{font-size:14px;margin:0 0 12px;color:var(--ivory);font-weight:500;}
+  .history-bars{display:flex;justify-content:space-between;align-items:flex-end;height:100px;background:var(--bg-panel);border-radius:18px;padding:14px 10px 10px;gap:5px;}
+  .hbar{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;justify-content:flex-end;height:100%;min-width:0;}
+  .hbar .num{font-size:11px;color:var(--ivory);opacity:.85;}
+  .hbar .col{width:100%;max-width:20px;border-radius:6px 6px 3px 3px;background:var(--ring-empty);transition:height .4s ease;}
+  .hbar.today .col{background:linear-gradient(180deg,var(--gold-soft),var(--gold));}
+  .hbar .lbl{font-size:10px;color:var(--sage);}
+  .hbar.today .lbl{color:var(--gold-soft);font-weight:700;}
+
+  footer{text-align:center;}
+  .ghost-btn{background:none;border:1px solid rgba(243,236,221,.2);color:var(--sage);padding:8px 18px;border-radius:999px;font-family:'Tajawal';font-size:12px;cursor:pointer;}
+  .ghost-btn:focus-visible{outline:2px solid var(--gold-soft);outline-offset:2px;}
+  .footnote{font-size:11px;color:rgba(243,236,221,.35);margin:10px 0 0;}
+
+  .modal-overlay{position:fixed;inset:0;background:rgba(5,12,13,.72);display:flex;align-items:center;justify-content:center;padding:24px;z-index:10;}
+  .modal{background:var(--bg-panel);border-radius:20px;padding:24px;max-width:300px;width:100%;text-align:center;border:1px solid rgba(243,236,221,.1);}
+  .modal p{margin:0 0 18px;font-size:14px;line-height:1.7;}
+  .modal-actions{display:flex;gap:10px;}
+  .modal-actions button{flex:1;padding:10px;border-radius:12px;border:none;font-family:'Tajawal';font-weight:500;cursor:pointer;font-size:13px;}
+  .btn-confirm{background:var(--gold);color:#1B1404;}
+  .btn-cancel{background:rgba(243,236,221,.08);color:var(--ivory);}
+  .hidden{display:none !important;}
+</style>
+</head>
+<body>
+  <div class="app" id="appRoot">
+    <header>
+      <p class="eyebrow">سُبحة رقمية</p>
+      <h1>عداد الاستغفار</h1>
+      <p class="tagline">كل ضغطة خرزة، وكل ٣٣ خرزة جولة جديدة</p>
+    </header>
+
+    <main style="display:flex;flex-direction:column;gap:20px;">
+      <div class="beads-wrap">
+        <svg id="beadsRing" class="ring" viewBox="0 0 266 266"></svg>
+        <button id="tapBtn" class="center-btn" aria-label="استغفر الله، اضغط للعدّ">
+          <span class="btn-phrase">استغفر<br/>الله</span>
+        </button>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat">
+          <span class="stat-value" id="todayCount">0</span>
+          <span class="stat-label">اليوم</span>
+        </div>
+        <div class="divider"></div>
+        <div class="stat">
+          <span class="stat-value" id="roundLabel">1</span>
+          <span class="stat-label">الجولة (33)</span>
+        </div>
+        <div class="divider"></div>
+        <div class="stat">
+          <span class="stat-value" id="allTimeCount">0</span>
+          <span class="stat-label">الإجمالي</span>
+        </div>
+      </div>
+
+      <button id="undoBtn" class="text-btn">تراجع عن آخر ضغطة</button>
+    </main>
+
+    <section class="history">
+      <h2>آخر 7 أيام</h2>
+      <div class="history-bars" id="historyBars"></div>
+    </section>
+
+    <footer>
+      <button id="resetTodayBtn" class="ghost-btn">تصفير عداد اليوم</button>
+      <p class="footnote">بياناتك محفوظة على جوالك فقط، ما حد يشوفها</p>
+    </footer>
+  </div>
+
+  <div id="confirmModal" class="modal-overlay hidden">
+    <div class="modal">
+      <p>تصفير عداد اليوم؟ سجل الأيام السابقة والإجمالي العام بيتعدل تبعًا لذلك، وما يمكن التراجع بعدها.</p>
+      <div class="modal-actions">
+        <button id="cancelResetBtn" class="btn-cancel">إلغاء</button>
+        <button id="confirmResetBtn" class="btn-confirm">نعم، صفّر</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const STORAGE_KEY = 'istighfar-data';
+  const ROUND_SIZE = 33;
+  const WEEKDAYS_AR = ['أحد','إثنين','ثلاثاء','أربعاء','خميس','جمعة','سبت'];
+
+  let state = { allTime: 0, days: {} };
+
+  function pad(n){ return String(n).padStart(2,'0'); }
+
+  function dateKeyOffset(offsetDays){
+    const d = new Date();
+    d.setDate(d.getDate() - offsetDays);
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  }
+
+  function todayKey(){ return dateKeyOffset(0); }
+
+  function loadState(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        const parsed = JSON.parse(raw);
+        state = { allTime: parsed.allTime || 0, days: parsed.days || {} };
+      }
+    }catch(e){
+      // no saved data yet — start fresh
+    }
+    render();
+  }
+
+  function saveState(){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }catch(e){
+      console.error('save failed', e);
+    }
+  }
+
+  function getTodayCount(){ return state.days[todayKey()] || 0; }
+
+  function increment(){
+    const k = todayKey();
+    state.days[k] = (state.days[k] || 0) + 1;
+    state.allTime += 1;
+    render();
+    animateTap(state.days[k]);
+    saveState();
+  }
+
+  function undoLast(){
+    const k = todayKey();
+    if((state.days[k] || 0) <= 0) return;
+    state.days[k] -= 1;
+    state.allTime = Math.max(0, state.allTime - 1);
+    render();
+    saveState();
+  }
+
+  function resetToday(){
+    const k = todayKey();
+    const c = state.days[k] || 0;
+    state.allTime = Math.max(0, state.allTime - c);
+    state.days[k] = 0;
+    render();
+    saveState();
+    closeModal();
+  }
+
+  function buildBeadsRing(){
+    const svg = document.getElementById('beadsRing');
+    const cx = 133, cy = 133, r = 118, beadR = 6.5;
+    for(let i = 0; i < ROUND_SIZE; i++){
+      const angle = (i / ROUND_SIZE) * 2 * Math.PI - Math.PI / 2;
+      const x = cx + r * Math.cos(angle);
+      const y = cy + r * Math.sin(angle);
+      const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      circle.setAttribute('cx', x);
+      circle.setAttribute('cy', y);
+      circle.setAttribute('r', beadR);
+      circle.classList.add('bead', 'empty');
+      circle.dataset.index = i;
+      svg.appendChild(circle);
+    }
+  }
+
+  function updateBeads(filledCount){
+    document.querySelectorAll('.bead').forEach((b) => {
+      const idx = parseInt(b.dataset.index, 10);
+      if(idx < filledCount){
+        b.classList.add('filled'); b.classList.remove('empty');
+      }else{
+        b.classList.remove('filled'); b.classList.add('empty');
+      }
+    });
+  }
+
+  function render(){
+    const today = getTodayCount();
+    const rem = today % ROUND_SIZE;
+    const filled = (rem === 0 && today > 0) ? ROUND_SIZE : rem;
+    updateBeads(filled);
+    document.getElementById('todayCount').textContent = today;
+    document.getElementById('allTimeCount').textContent = state.allTime;
+    document.getElementById('roundLabel').textContent = today === 0 ? 1 : Math.ceil(today / ROUND_SIZE);
+    document.getElementById('undoBtn').disabled = today === 0;
+    renderHistory();
+  }
+
+  function renderHistory(){
+    const container = document.getElementById('historyBars');
+    container.innerHTML = '';
+    const items = [];
+    for(let i = 6; i >= 0; i--){
+      const key = dateKeyOffset(i);
+      const d = new Date(); d.setDate(d.getDate() - i);
+      items.push({ count: state.days[key] || 0, isToday: i === 0, weekday: WEEKDAYS_AR[d.getDay()] });
+    }
+    const max = Math.max(1, ...items.map(it => it.count));
+    items.forEach(it => {
+      const wrap = document.createElement('div');
+      wrap.className = 'hbar' + (it.isToday ? ' today' : '');
+      const num = document.createElement('div'); num.className = 'num'; num.textContent = it.count;
+      const col = document.createElement('div'); col.className = 'col';
+      col.style.height = Math.max(6, (it.count / max) * 100) + '%';
+      const lbl = document.createElement('div'); lbl.className = 'lbl'; lbl.textContent = it.isToday ? 'اليوم' : it.weekday.slice(0,3);
+      wrap.appendChild(num); wrap.appendChild(col); wrap.appendChild(lbl);
+      container.appendChild(wrap);
+    });
+  }
+
+  function animateTap(newCount){
+    if(navigator.vibrate) navigator.vibrate(12);
+    if(newCount % ROUND_SIZE === 0){
+      const svg = document.getElementById('beadsRing');
+      svg.classList.remove('ring-pulse');
+      requestAnimationFrame(() => svg.classList.add('ring-pulse'));
+      if(navigator.vibrate) navigator.vibrate([10,40,10,40,30]);
+    }
+  }
+
+  function openModal(){ document.getElementById('confirmModal').classList.remove('hidden'); }
+  function closeModal(){ document.getElementById('confirmModal').classList.add('hidden'); }
+
+  document.getElementById('tapBtn').addEventListener('click', increment);
+  document.getElementById('undoBtn').addEventListener('click', undoLast);
+  document.getElementById('resetTodayBtn').addEventListener('click', openModal);
+  document.getElementById('confirmResetBtn').addEventListener('click', resetToday);
+  document.getElementById('cancelResetBtn').addEventListener('click', closeModal);
+
+  buildBeadsRing();
+  loadState();
+
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js').catch(() => {});
+    });
+  }
+</script>
+</body>
+</html>
